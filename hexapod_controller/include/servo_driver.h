@@ -64,6 +64,8 @@ class ServoDriver
         std::vector<int> servo_orientation_; // If the servo is physically mounted backwards this sign is flipped
         std::vector<std::string> servo_map_key_;
         bool servos_free_;
+        int SERVO_CONTROLLER_ID;
+        int ENABLE_SERVOS_REGISTER;
         int SERVO_COUNT;
         int TORQUE_ENABLE, PRESENT_POSITION_L, GOAL_POSITION_L, INTERPOLATION_LOOP_RATE;
 };

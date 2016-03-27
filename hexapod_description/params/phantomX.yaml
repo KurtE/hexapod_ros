@@ -1,5 +1,10 @@
 # Configuration Settings
 
+# Servo controller Settings
+SERVO_CONTROLLER_ID: 200
+SERVO_CONTROLLER_BAUD_NUM: 0
+SERVO_CONTROLLER_ENABLE_SERVOS_REGISTER: 24
+
 # Speed limit in Hz for the master loop rate
 MASTER_LOOP_RATE: 500
 

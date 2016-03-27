@@ -41,6 +41,15 @@ ServoDriver::ServoDriver( void )
     int baudnum = 1;
     int deviceIndex = 0;
 
+    if (!ros::param::get( "SERVO_CONTROLLER_ID", SERVO_CONTROLLER_ID ))
+        SERVO_CONTROLLER_ID = 0xfd; // default assumes USB2AX
+
+    if (!ros::param::get("SERVO_CONTROLLER_BAUD_NUM", baudnum))
+        baudnum = 1;        // Assume 1mbs
+
+    if (!ros::param::get("SERVO_CONTROLLER_ENABLE_SERVOS_REGISTER", ENABLE_SERVOS_REGISTER))
+        ENABLE_SERVOS_REGISTER = -1;
+
     if( dxl_initialize( deviceIndex, baudnum ) == 0 )
     {
         ROS_WARN("Servo Communication Failed! Ignore if just running for Rviz or Gazebo.");
@@ -53,6 +62,22 @@ ServoDriver::ServoDriver( void )
     ros::param::get( "GOAL_POSITION_L", GOAL_POSITION_L );
     ros::param::get( "SERVOS", SERVOS );
     ros::param::get( "INTERPOLATION_LOOP_RATE", INTERPOLATION_LOOP_RATE );
+
+    // See which Servo controller we are using as some of them
+    // need us to do something to turn on the power to the servos
+    int  controller_model_number = dxl_read_word(SERVO_CONTROLLER_ID, 0 );
+    if (dxl_get_result() != COMM_RXSUCCESS)
+    {
+        ROS_WARN("Servo Controller %x Not Found! Ignore if just running for Rviz or Gazebo.", SERVO_CONTROLLER_ID);
+    }
+
+    // Do we need to turn power on to the servos? 
+    if (ENABLE_SERVOS_REGISTER != -1)
+    {
+        dxl_write_byte(SERVO_CONTROLLER_ID, ENABLE_SERVOS_REGISTER, 1);
+        ROS_INFO("Hexapod power to servos on.");
+    }
+
     for( XmlRpc::XmlRpcValue::iterator it = SERVOS.begin(); it != SERVOS.end(); it++ )
     {
         servo_map_key_.push_back( it->first );
@@ -94,6 +119,13 @@ ServoDriver::ServoDriver( void )
 ServoDriver::~ServoDriver( void )
 {
     freeServos();
+
+    // If the controller enables power to servos, turn it off now
+    if (ENABLE_SERVOS_REGISTER != -1)
+    {
+        dxl_write_byte(SERVO_CONTROLLER_ID, ENABLE_SERVOS_REGISTER, 0);
+        ROS_INFO("Hexapod power to servos off.");
+    }
     dxl_terminate();
 }
 
