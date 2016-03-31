@@ -35,6 +35,8 @@
 #include <ros/ros.h>
 #include <dynamixel.h>
 #include <sensor_msgs/JointState.h>
+#include <std_msgs/Bool.h>
+
 
 //==============================================================================
 // Define the class(s) for Servo Drivers.
@@ -52,8 +54,8 @@ class ServoDriver
         void makeSureServosAreOn( const sensor_msgs::JointState &joint_state );
         std::vector<int> cur_pos_; // Current position of servos
         std::vector<int> goal_pos_; // Goal position of servos
-        std::vector<int> pose_steps_; // Increment to use going from current position to goal position
-        std::vector<int> write_pos_; // Position of each servo for sync_write packet
+        std::vector<double> pose_steps_;    // Increment to use going from current position to goal position
+        std::vector<double> write_pos_;     // Position of each servo for sync_write packet
         std::vector<double> OFFSET; // Physical hardware offset of servo horn
         std::vector<int> ID; // Servo IDs
         std::vector<int> TICKS; // Total number of ticks, meaning resolution of dynamixel servo
@@ -68,6 +70,19 @@ class ServoDriver
         int ENABLE_SERVOS_REGISTER;
         int SERVO_COUNT;
         int TORQUE_ENABLE, PRESENT_POSITION_L, GOAL_POSITION_L, INTERPOLATION_LOOP_RATE;
+
+        // Kurt's Debug timing stuff...
+        ros::Subscriber servo_debug_sub_;
+        void servoDebugCallback( const std_msgs::BoolConstPtr &msg );
+        ros::NodeHandle nh_;
+        bool servo_debug_;
+        
+        // Some more debug counters
+        int count_calls_;           // How many times was transmitServoPositions called
+        int count_dxl_packets_;     // How many packets have we sent stuff to usb2ax
+        int sum_servo_infos_;       // How many servos total did we output...
+        ros::Time debug_start_time_; // start time
+
 };
 
 #endif
