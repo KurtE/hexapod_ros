@@ -38,19 +38,23 @@
 ServoDriver::ServoDriver( void )
 {
     // Initialize the USB2AX
-    int baudnum = 1;
-    int deviceIndex = 0;
+    int baud= 1000000L;
+    std::string servo_controller_device_name;
 
     if (!ros::param::get( "SERVO_CONTROLLER_ID", SERVO_CONTROLLER_ID ))
         SERVO_CONTROLLER_ID = 0xfd; // default assumes USB2AX
+    
+    ros::param::get("SERVO_CONTROLLER_DEVICE_NAME", servo_controller_device_name); 
 
-    if (!ros::param::get("SERVO_CONTROLLER_BAUD_NUM", baudnum))
-        baudnum = 1;        // Assume 1mbs
+    if (!ros::param::get("SERVO_CONTROLLER_BAUD", baud))
+        baud = 1000000L;
 
     if (!ros::param::get("SERVO_CONTROLLER_ENABLE_SERVOS_REGISTER", ENABLE_SERVOS_REGISTER))
         ENABLE_SERVOS_REGISTER = -1;
 
-    if( dxl_initialize( deviceIndex, baudnum ) == 0 )
+    ROS_INFO("ServoDriver: Device: %s, Baud: %d", servo_controller_device_name.c_str(), baud);
+
+    if( dxl_initialize( servo_controller_device_name.c_str(), baud ) == 0 )
     {
         ROS_WARN("Servo Communication Failed! Ignore if just running for Rviz or Gazebo.");
     }

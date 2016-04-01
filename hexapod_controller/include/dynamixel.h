@@ -8,7 +8,7 @@ extern "C" {
 
 
 ///////////// device control methods ////////////////////////
-int dxl_initialize( int deviceIndex, int baudnum );
+int dxl_initialize( const char *dev_name, unsigned long baud );
 void dxl_terminate();
 
 
