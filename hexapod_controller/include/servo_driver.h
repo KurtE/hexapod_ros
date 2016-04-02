@@ -47,7 +47,7 @@ class ServoDriver
     public:
         ServoDriver( void );
         ~ServoDriver( void );
-        void transmitServoPositions( const sensor_msgs::JointState &joint_state );
+        void transmitServoPositions( const sensor_msgs::JointState &joint_state, double velocity_division);
         void freeServos( void );
     private:
         void convertAngles( const sensor_msgs::JointState &joint_state );

@@ -80,6 +80,7 @@ Control::Control( void )
     imu_yaw_lowpass_ = 0.0;
     imu_roll_init_ = 0.0;
     imu_pitch_init_ = 0.0;
+    velocity_division_ = VELOCITY_DIVISION;     // setup default
 
     // Topics we are subscribing
     cmd_vel_sub_ = nh_.subscribe<geometry_msgs::Twist>( "/cmd_vel", 1, &Control::cmd_velCallback, this );
@@ -88,6 +89,9 @@ Control::Control( void )
     state_sub_ = nh_.subscribe<std_msgs::Bool>( "/state", 1, &Control::stateCallback, this );
     imu_override_sub_ = nh_.subscribe<std_msgs::Bool>( "/imu/imu_override", 1, &Control::imuOverrideCallback, this );
     imu_sub_ = nh_.subscribe<sensor_msgs::Imu>( "/imu/data", 1, &Control::imuCallback, this );
+
+    velocity_division_sub_ = nh_.subscribe<std_msgs::Float64>( "/velocity_division", 1, &Control::velocityDivisionCallback, this );
+
 
     // Topics we are publishing
     sounds_pub_ = nh_.advertise<hexapod_msgs::Sounds>( "/sounds", 10 );
@@ -432,13 +436,21 @@ void Control::imuCallback( const sensor_msgs::ImuConstPtr &imu_msg )
 }
 
 //==============================================================================
+// VELOCITY_DIVISION  callback
+//==============================================================================
+
+void Control::velocityDivisionCallback( const std_msgs::Float64ConstPtr &msg )
+{
+    velocity_division_ = (double)msg->data;
+}
+//==============================================================================
 // Partitions up the cmd_vel to the speed of the loop rate
 //==============================================================================
 
 void Control::partitionCmd_vel( geometry_msgs::Twist *cmd_vel )
 {
-    // Instead of getting delta time we are calculating with a static division
-    double dt = VELOCITY_DIVISION;
+    // Use our member variable as to allow the value to be updated. 
+    double dt = velocity_division_;
 
     double delta_th = cmd_vel_incoming_.angular.z * dt;
     double delta_x = ( cmd_vel_incoming_.linear.x * cos( delta_th ) - cmd_vel_incoming_.linear.y * sin( delta_th ) ) * dt;

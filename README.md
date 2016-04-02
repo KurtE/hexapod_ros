@@ -23,24 +23,25 @@ Gait style is a simple sinusoidal tripod gait. I chose it due to its simplicity 
 ## 3. Dependencies
 
 ```
-sudo apt-get install git
-sudo apt-get install ros-indigo-sound-play
-sudo apt-get install ros-indigo-diagnostic-updater
-sudo apt-get install ros-indigo-xacro
-sudo apt-get install ros-indigo-openni2-launch
-sudo apt-get install ros-indigo-depthimage-to-laserscan
-sudo apt-get install ros-indigo-joystick-drivers
-sudo apt-get install ros-indigo-imu-filter-madgwick
-sudo apt-get install ros-indigo-robot-localization
-sudo apt-get install ros-indigo-rtabmap
-sudo apt-get install ros-indigo-rtabmap-ros
-sudo apt-get install ros-indigo-robot-state-publisher
-sudo apt-get install ros-indigo-gazebo-ros-control
-sudo apt-get install ros-indigo-navigation
-sudo apt-get install ros-indigo-move_base
-sudo apt-get install ros-indigo-navfn
-sudo apt-get install ros-indigo-amcl
-sudo apt-get install libusb-1.0-0-dev
+sudo apt-get install -y git
+sudo apt-get install -y ros-indigo-sound-play
+sudo apt-get install -y ros-indigo-diagnostic-updater
+sudo apt-get install -y ros-indigo-xacro
+sudo apt-get install -y ros-indigo-openni2-launch
+sudo apt-get install -y ros-indigo-depthimage-to-laserscan
+sudo apt-get install -y ros-indigo-joystick-drivers
+sudo apt-get install -y ros-indigo-imu-filter-madgwick
+sudo apt-get install -y ros-indigo-robot-localization
+sudo apt-get install -y ros-indigo-rtabmap
+sudo apt-get install -y ros-indigo-rtabmap-ros
+sudo apt-get install -y ros-indigo-robot-state-publisher
+sudo apt-get install -y ros-indigo-gazebo-ros-control
+sudo apt-get install -y ros-indigo-navigation
+sudo apt-get install -y ros-indigo-move_base
+sudo apt-get install -y ros-indigo-navfn
+sudo apt-get install -y ros-indigo-amcl
+sudo apt-get install -y libusb-1.0-0-dev
+sudo apt-get install -y ros-indigo-gazebo-ros-control
 ```
 
 **_Joystick_**

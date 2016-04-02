@@ -7,7 +7,7 @@ extern "C" {
 #endif
 
 
-int dxl_hal_open( int devIndex, float baudrate );
+int dxl_hal_open( const char* dev_name, unsigned long baud );
 void dxl_hal_close();
 void dxl_hal_clear();
 void dxl_hal_flush();

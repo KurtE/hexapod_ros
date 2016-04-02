@@ -38,19 +38,23 @@
 ServoDriver::ServoDriver( void )
 {
     // Initialize the USB2AX
-    int baudnum = 1;
-    int deviceIndex = 0;
+    int baud= 1000000L;
+    std::string servo_controller_device_name;
 
     if (!ros::param::get( "SERVO_CONTROLLER_ID", SERVO_CONTROLLER_ID ))
         SERVO_CONTROLLER_ID = 0xfd; // default assumes USB2AX
 
-    if (!ros::param::get("SERVO_CONTROLLER_BAUD_NUM", baudnum))
-        baudnum = 1;        // Assume 1mbs
+    ros::param::get("SERVO_CONTROLLER_DEVICE_NAME", servo_controller_device_name); 
+
+    if (!ros::param::get("SERVO_CONTROLLER_BAUD", baud))
+        baud = 1000000L;
 
     if (!ros::param::get("SERVO_CONTROLLER_ENABLE_SERVOS_REGISTER", ENABLE_SERVOS_REGISTER))
         ENABLE_SERVOS_REGISTER = -1;
 
-    if( dxl_initialize( deviceIndex, baudnum ) == 0 )
+    ROS_INFO("ServoDriver: Device: %s, Baud: %d", servo_controller_device_name.c_str(), baud);
+
+    if( dxl_initialize( servo_controller_device_name.c_str(), baud ) == 0 )
     {
         ROS_WARN("Servo Communication Failed! Ignore if just running for Rviz or Gazebo.");
     }
@@ -199,7 +203,7 @@ void ServoDriver::makeSureServosAreOn( const sensor_msgs::JointState &joint_stat
 // Updates the positions of the servos and sends USB2AX broadcast packet
 //==============================================================================
 
-void ServoDriver::transmitServoPositions( const sensor_msgs::JointState &joint_state )
+void ServoDriver::transmitServoPositions( const sensor_msgs::JointState &joint_state, double velocity_division )
 {
     convertAngles( joint_state ); // Convert angles to servo resolution
 
@@ -209,7 +213,11 @@ void ServoDriver::transmitServoPositions( const sensor_msgs::JointState &joint_s
 
 #define MAX_POSE_STEPS 2   // Will differ for AX/MX...
     int interpolating = 0;
-    int iteration_count = 7;    // Hard code to test
+
+    int iteration_count = (int)((double)INTERPOLATION_LOOP_RATE * velocity_division);
+    if (iteration_count < 1)
+        iteration_count = 1;    // make sure we won't divide by zero.
+
     int max_servo_delta;
     // Calculate the delta pre iteration for each servo
     // Make sure we don't allow the servos to move faster than some

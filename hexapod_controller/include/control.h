@@ -36,6 +36,7 @@
 #include <tf/transform_broadcaster.h>
 #include <std_srvs/Empty.h>
 #include <std_msgs/Bool.h>
+#include <std_msgs/Float64.h>
 #include <geometry_msgs/Vector3.h>
 #include <geometry_msgs/Twist.h>
 #include <geometry_msgs/TwistWithCovarianceStamped.h>
@@ -76,6 +77,7 @@ class Control
         double STANDING_BODY_HEIGHT;
         geometry_msgs::Twist gait_vel_;
         geometry_msgs::Twist cmd_vel_;
+        double velocity_division_;
 
     private:
         hexapod_msgs::Sounds sounds_; // Sound bool array
@@ -114,6 +116,9 @@ class Control
         void imuOverrideCallback( const std_msgs::BoolConstPtr &imu_override_msg );
         ros::Subscriber imu_sub_;
         void imuCallback( const sensor_msgs::ImuConstPtr &imu_msg );
+
+        ros::Subscriber velocity_division_sub_;
+        void velocityDivisionCallback( const std_msgs::Float64ConstPtr &msg );
 
         // Topics we are publishing
         ros::Publisher sounds_pub_;
