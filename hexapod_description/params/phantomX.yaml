@@ -79,7 +79,6 @@ MAX_LIFT_HEIGHT: 0.050
 LEG_GAIT_ORDER: [0, 1, 0, 1, 0, 1]
 
 # Speed in Hz that the servos interpolate between gait poses
-INTERPOLATION_LOOP_RATE: 550
 
 # Servo descriptions
 SERVOS: {

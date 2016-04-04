@@ -211,7 +211,7 @@ void ServoDriver::transmitServoPositions( const sensor_msgs::JointState &joint_s
 
     count_calls_++; //KJE
 
-#define MAX_POSE_STEPS 2   // Will differ for AX/MX...
+#define MAX_POSE_STEPS 10   // Will differ for AX/MX...
     int interpolating = 0;
 
     int iteration_count = (int)((double)INTERPOLATION_LOOP_RATE * velocity_division);
@@ -233,8 +233,8 @@ void ServoDriver::transmitServoPositions( const sensor_msgs::JointState &joint_s
             int servo_delta = goal_pos_[i] - cur_pos_[i]; 
             write_pos_[i] = cur_pos_[i];
             pose_steps_[i] = ((double)(servo_delta)) / iteration_count;
-            if (abs(servo_delta) > max_servo_delta)
-                max_servo_delta = abs(max_servo_delta);
+            if (std::abs(servo_delta) > max_servo_delta)
+                max_servo_delta = std::abs(max_servo_delta);
         }
         if (max_servo_delta/iteration_count > MAX_POSE_STEPS)
             iteration_count = (max_servo_delta+MAX_POSE_STEPS+1)/MAX_POSE_STEPS;
