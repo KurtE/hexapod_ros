@@ -57,9 +57,11 @@ HexapodTeleopJoystick::HexapodTeleopJoystick( void )
     ros::param::get( "MAX_RADIANS_PER_SEC", MAX_RADIANS_PER_SEC );
 
     ros::param::get( "VELOCITY_DIVISION", VELOCITY_DIVISION );
-    ros::param::get( "MAX_VELOCITY_DIVISION", MAX_VELOCITY_DIVISION );
-    ros::param::get( "MIN_VELOCITY_DIVISION", MIN_VELOCITY_DIVISION );
+    if (!ros::param::get( "MAX_VELOCITY_DIVISION", MAX_VELOCITY_DIVISION ))
+        MAX_VELOCITY_DIVISION = VELOCITY_DIVISION;
 
+    if (!ros::param::get( "MIN_VELOCITY_DIVISION", MIN_VELOCITY_DIVISION ))
+        MIN_VELOCITY_DIVISION = VELOCITY_DIVISION;
 
     joy_sub_ = nh_.subscribe<sensor_msgs::Joy>("/joy", 5, &HexapodTeleopJoystick::joyCallback, this);
     body_scalar_pub_ = nh_.advertise<geometry_msgs::AccelStamped>("/body_scalar", 100);
@@ -73,6 +75,18 @@ HexapodTeleopJoystick::HexapodTeleopJoystick( void )
     buttons_prev_.assign(max_button, 0);  // zero this one out... 
     velocity_division_.data = VELOCITY_DIVISION;    
 
+    if (std::abs(MAX_VELOCITY_DIVISION-MIN_VELOCITY_DIVISION) < 0.0001)
+    {
+        // Min/MAX not defined... so turn off changes...
+        cmd_vel_speed_scaler_ = 1.0;
+        SPEED_UP_BUTTON = max_button;   // out of range;
+        SLOW_DOWN_BUTTON = max_button;  // 
+    }
+    else
+    {
+        // Setup scaler for cmd_vel values for the different speeds. 
+        cmd_vel_speed_scaler_ = ( MAX_VELOCITY_DIVISION - velocity_division_.data ) / ( MAX_VELOCITY_DIVISION - MIN_VELOCITY_DIVISION );
+    }
 }
 
 //==============================================================================
@@ -131,6 +145,7 @@ void HexapodTeleopJoystick::joyCallback( const sensor_msgs::Joy::ConstPtr &joy )
             }
             ROS_INFO("Speed up Velocity Division: %f", (double)velocity_division_.data);
             velocity_division_pub_.publish( velocity_division_ );
+            cmd_vel_speed_scaler_ = ( MAX_VELOCITY_DIVISION - velocity_division_.data ) / ( MAX_VELOCITY_DIVISION - MIN_VELOCITY_DIVISION );
         }
     }
     if (buttonPressed( joy, SLOW_DOWN_BUTTON ))
@@ -158,6 +173,7 @@ void HexapodTeleopJoystick::joyCallback( const sensor_msgs::Joy::ConstPtr &joy )
             }
             ROS_INFO("Slow down Velocity Division: %f", (double)velocity_division_.data);
             velocity_division_pub_.publish( velocity_division_ );
+            cmd_vel_speed_scaler_ = ( MAX_VELOCITY_DIVISION - velocity_division_.data ) / ( MAX_VELOCITY_DIVISION - MIN_VELOCITY_DIVISION );
         }
     }
 
@@ -178,9 +194,9 @@ void HexapodTeleopJoystick::joyCallback( const sensor_msgs::Joy::ConstPtr &joy )
         imu_override_.data = false;
 
         // Travelling
-        cmd_vel_.linear.x = joy->axes[FORWARD_BACKWARD_AXES] * MAX_METERS_PER_SEC;
-        cmd_vel_.linear.y = -joy->axes[LEFT_RIGHT_AXES] * MAX_METERS_PER_SEC;
-        cmd_vel_.angular.z = joy->axes[YAW_ROTATION_AXES] * MAX_RADIANS_PER_SEC;
+        cmd_vel_.linear.x = joy->axes[FORWARD_BACKWARD_AXES] * MAX_METERS_PER_SEC * cmd_vel_speed_scaler_;
+        cmd_vel_.linear.y = -joy->axes[LEFT_RIGHT_AXES] * MAX_METERS_PER_SEC * cmd_vel_speed_scaler_;
+        cmd_vel_.angular.z = joy->axes[YAW_ROTATION_AXES] * MAX_RADIANS_PER_SEC * cmd_vel_speed_scaler_;
     }
 
     // Lets remember the state of the buttons...
