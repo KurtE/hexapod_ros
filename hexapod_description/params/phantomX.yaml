@@ -1,15 +1,18 @@
 # Configuration Settings
 
 # Servo controller Settings
-SERVO_CONTROLLER_ID: 200
-SERVO_CONTROLLER_BAUD_NUM: 0
-SERVO_CONTROLLER_ENABLE_SERVOS_REGISTER: 24
+#SERVO_CONTROLLER_ID: 200
+#SERVO_CONTROLLER_BAUD: 2000000
+#SERVO_CONTROLLER_DEVICE_NAME: /dev/ttyDXL
+#SERVO_CONTROLLER_ENABLE_SERVOS_REGISTER: 24
 
 # Speed limit in Hz for the master loop rate
 MASTER_LOOP_RATE: 500
 
 # Static time division to convert cmd_vel into segments for controller loop
 VELOCITY_DIVISION: 0.033
+MAX_VELOCITY_DIVISION: 0.10
+MIN_VELOCITY_DIVISION: 0.015
 
 # Twist Max Values
 # Currently these are set from a topic echo of the "twist" message coming out of the locomotion node.
