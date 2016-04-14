@@ -57,6 +57,7 @@ class HexapodTeleopJoystick
         ros::Publisher imu_override_pub_;
         ros::Publisher velocity_division_pub_;
         ros::Publisher servo_debug_pub_;
+        bool NON_TELEOP; // Shuts down cmd_vel broadcast
 
     private:
         void joyCallback( const sensor_msgs::Joy::ConstPtr &joy );
@@ -74,7 +75,6 @@ class HexapodTeleopJoystick
         double VELOCITY_DIVISION, MAX_VELOCITY_DIVISION, MIN_VELOCITY_DIVISION;
         double MAX_METERS_PER_SEC, MAX_RADIANS_PER_SEC;
         double cmd_vel_speed_scaler_;
-        bool NON_TELEOP; // Shuts down cmd_vel broadcast
 };
 
 #endif // HEXAPOD_TELEOP_H_
