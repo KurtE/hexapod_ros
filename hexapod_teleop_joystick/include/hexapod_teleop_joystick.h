@@ -74,6 +74,7 @@ class HexapodTeleopJoystick
         double VELOCITY_DIVISION, MAX_VELOCITY_DIVISION, MIN_VELOCITY_DIVISION;
         double MAX_METERS_PER_SEC, MAX_RADIANS_PER_SEC;
         double cmd_vel_speed_scaler_;
+        bool NON_TELEOP; // Shuts down cmd_vel broadcast
 };
 
 #endif // HEXAPOD_TELEOP_H_

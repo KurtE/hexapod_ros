@@ -41,6 +41,7 @@ HexapodTeleopJoystick::HexapodTeleopJoystick( void )
     imu_override_.data = false;
     debug_servos_.data = false; 
     int max_button;
+    NON_TELEOP = false; // Static but here for a safety precaution
     ros::param::get( "STANDUP_BUTTON", STANDUP_BUTTON );
     ros::param::get( "SITDOWN_BUTTON", SITDOWN_BUTTON );
     ros::param::get( "BODY_ROTATION_BUTTON", BODY_ROTATION_BUTTON );
@@ -55,6 +56,7 @@ HexapodTeleopJoystick::HexapodTeleopJoystick( void )
     ros::param::get( "PITCH_ROTATION_AXES", PITCH_ROTATION_AXES );
     ros::param::get( "MAX_METERS_PER_SEC", MAX_METERS_PER_SEC );
     ros::param::get( "MAX_RADIANS_PER_SEC", MAX_RADIANS_PER_SEC );
+    ros::param::get( "NON_TELEOP", NON_TELEOP );
 
     ros::param::get( "VELOCITY_DIVISION", VELOCITY_DIVISION );
     if (!ros::param::get( "MAX_VELOCITY_DIVISION", MAX_VELOCITY_DIVISION ))
@@ -236,10 +238,13 @@ int main(int argc, char** argv)
     ros::Rate loop_rate( 100 ); // 100 hz
     while ( ros::ok() )
     {
-        hexapodTeleopJoystick.body_scalar_pub_.publish( hexapodTeleopJoystick.body_scalar_ );
-        hexapodTeleopJoystick.head_scalar_pub_.publish( hexapodTeleopJoystick.head_scalar_ );
-        hexapodTeleopJoystick.state_pub_.publish( hexapodTeleopJoystick.state_ );
-        hexapodTeleopJoystick.cmd_vel_pub_.publish( hexapodTeleopJoystick.cmd_vel_ );
+        if( NON_TELEOP == false ) // If True, assumes you are sending these from other packages
+        {
+            hexapodTeleopJoystick.cmd_vel_pub_.publish( hexapodTeleopJoystick.cmd_vel_ );
+            hexapodTeleopJoystick.body_scalar_pub_.publish( hexapodTeleopJoystick.body_scalar_ );
+            hexapodTeleopJoystick.head_scalar_pub_.publish( hexapodTeleopJoystick.head_scalar_ );
+        }
+        hexapodTeleopJoystick.state_pub_.publish( hexapodTeleopJoystick.state_ ); // Always publish for means of an emergency shutdown type situation
         hexapodTeleopJoystick.imu_override_pub_.publish( hexapodTeleopJoystick.imu_override_ );
         loop_rate.sleep();
     }

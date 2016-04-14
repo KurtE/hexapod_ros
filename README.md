@@ -83,9 +83,9 @@ This package has all the param files. You will start with one of the param confi
 
 
 **Example Launch Command**
-
+```
 roslaunch hexapod_bringup hexapod_full.launch config:=phantomX joy_mapping:=joystick_ds3
-
+```
 ## 5. Install
 
 ```

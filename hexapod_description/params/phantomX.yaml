@@ -6,6 +6,10 @@
 #SERVO_CONTROLLER_DEVICE_NAME: /dev/ttyDXL
 #SERVO_CONTROLLER_ENABLE_SERVOS_REGISTER: 24
 
+# Non teleop mode for naviagtion stack, Gazebo, etc type modes.
+# Controller will still have standup and sitdown functions for safty reasons 
+NON_TELEOP: false
+
 # Speed limit in Hz for the master loop rate
 MASTER_LOOP_RATE: 500
 
