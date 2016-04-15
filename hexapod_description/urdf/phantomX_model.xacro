@@ -57,14 +57,14 @@
     </gazebo>
 
 	<!-- Head Pan and Tilt properties -->
-	<joint name="head_pan_joint" type="revolute">
+	<joint name="pan_joint" type="revolute">
 		<parent link="body_link"/>
-		<child link="head_pan_link"/>
+		<child link="pan_link"/>
 		<axis xyz="0.0 0.0 1.0" />
 		<origin xyz="0.145 0.0 0.080" />
-		<limit lower="-${3.14}" upper="${3.14}" effort="10000" velocity="100" />
+        <limit lower="${joint_lower_limit}" upper="${joint_upper_limit}" effort="${joint_effort}" velocity="${joint_velocity}"/>
 	</joint>
-	<link name="head_pan_link">
+	<link name="pan_link">
         <inertial>
             <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
             <mass value="0.00001"/>
@@ -74,14 +74,14 @@
                 izz="1.0" />
         </inertial>
     </link>
-	<joint name="head_tilt_joint" type="revolute">
-		<parent link="head_pan_link"/>
-		<child link="head_tilt_link"/>
+	<joint name="tilt_joint" type="revolute">
+		<parent link="pan_link"/>
+		<child link="tilt_link"/>
 		<axis xyz="0.0 1.0 0.0" />
 		<origin xyz="0.0 0.0 0.020" />
-		<limit lower="-${3.14}" upper="${3.14}" effort="10000" velocity="100" />
+        <limit lower="${joint_lower_limit}" upper="${joint_upper_limit}" effort="${joint_effort}" velocity="${joint_velocity}"/>
 	</joint>
-	<link name="head_tilt_link">
+	<link name="tilt_link">
         <inertial>
             <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
             <mass value="0.00001"/>
@@ -92,13 +92,13 @@
         </inertial>
     </link>
 
-	<!-- Camera properties -->
-	<joint name="camera_rgb_joint" type="fixed">
-		<parent link="head_tilt_link" />
-		<child link="camera_rgb_optical_frame" />
-		<origin xyz="0.0 0.0 0.0" rpy="${pi/2} ${pi} ${pi/2}" />
-	</joint>
-	<link name="camera_rgb_optical_frame">
+    <!-- Camera properties -->
+    <joint name="camera_rgb_joint" type="fixed">
+        <parent link="body_link"/>
+        <child link="camera_rgb_optical_frame"/>
+        <origin xyz="0.150 0.0255 0.034" rpy="${pi/2} ${pi} ${pi/2}"/>
+    </joint>
+    <link name="camera_rgb_optical_frame">
         <inertial>
             <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
             <mass value="0.00001"/>
@@ -109,29 +109,12 @@
         </inertial>
     </link>
 
-	<joint name="camera_depth_joint" type="fixed">
-		<parent link="head_tilt_link" />
-		<child link="camera_depth_optical_frame" />
-		<origin xyz="0.0 0.0 0.0" rpy="${pi/2} ${pi} ${pi/2}" />
-	</joint>
-	<link name="camera_depth_optical_frame" >
-        <inertial>
-            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
-            <mass value="0.00001"/>
-            <inertia
-                ixx="1.0" ixy="0.0"  ixz="0.0"
-                iyy="1.0" iyz="0.0"
-                izz="1.0" />
-        </inertial>
-    </link>
-
-<joint name="camera_depth_frame" type="fixed">
-	<parent link="head_tilt_link" />
-	<child link="camera_depth_frame_link" />
-	<origin xyz="0.0 0.0 0.0" />
-</joint>
-
-<link name="camera_depth_frame_link" >
+    <joint name="camera_depth_joint" type="fixed">
+        <parent link="body_link"/>
+        <child link="camera_depth_optical_frame"/>
+        <origin xyz="0.150 -0.0225 0.034" rpy="${pi/2} ${pi} ${pi/2}"/>
+    </joint>
+    <link name="camera_depth_optical_frame">
         <inertial>
             <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
             <mass value="0.00001"/>
