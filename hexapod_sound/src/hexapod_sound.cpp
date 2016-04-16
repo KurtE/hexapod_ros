@@ -30,6 +30,8 @@
 
 #include <hexapod_sound.h>
 #include <ros/package.h>
+#define MPLAYER_HACK   // I have problems with ROS Sound on ODroid - hack to get somethign working...
+
 
 //==============================================================================
 // Constructor
@@ -37,94 +39,104 @@
 
 HexapodSound::HexapodSound( void )
 {
+#ifndef MPLAYER_HACK
     sound_pub_ = nh_.advertise<sound_play::SoundRequest>("/robotsound", 1, 0);
-    sounds_sub_ = nh_.subscribe<hexapod_msgs::Sounds>( "/sounds", 1, &HexapodSound::soundsCallback, this);
+#endif
+    sounds_sub_ = nh_.subscribe<std_msgs::Int32>( "/sounds", 1, &HexapodSound::soundsCallback, this);
     sound_package_path_ = ros::package::getPath("hexapod_sound");
+
+    if (ros::param::get( "SOUNDS", SOUNDS ) )
+    {
+        // We have a sound section so lets load from there
+        for( XmlRpc::XmlRpcValue::iterator it = SOUNDS.begin(); it != SOUNDS.end(); it++ )
+        {
+            sound_map_key_.push_back( it->first );
+        }
+        // resize our sound items... 
+        int sound_count = sound_map_key_.size();
+        sound_id_.resize(sound_count);
+        sound_type_.resize(sound_count);
+        sound_delay_time_.resize(sound_count);
+        sound_file_name_.resize(sound_count);
+
+        for( int i = 0; i < sound_count; i++ )
+        {
+            ros::param::get( "SOUNDS/" + static_cast<std::string>( sound_map_key_[i] ) + "/id", sound_id_[i] );
+            ros::param::get( "SOUNDS/" + static_cast<std::string>( sound_map_key_[i] ) + "/type", sound_type_[i] );
+            ros::param::get( "SOUNDS/" + static_cast<std::string>( sound_map_key_[i] ) + "/delay", sound_delay_time_[i] );
+            ros::param::get( "SOUNDS/" + static_cast<std::string>( sound_map_key_[i] ) + "/file", sound_file_name_[i] );
+        }
+
+    }
+    else
+    {
+        // sound section not found default values to default project
+        // first pass have main function define the sound file mappings.
+        for (int i = HexapodSounds::STARTUP; i <= HexapodSounds::AUTO_LEVEL; i++)
+        {
+            sound_id_.push_back(i);
+            sound_type_.push_back(HexapodSounds::SOUND_FILE);  
+            sound_delay_time_.push_back(i==HexapodSounds::AUTO_LEVEL? 6 : 3);
+        }
+
+        sound_file_name_.push_back("intelChime.ogg");
+        sound_file_name_.push_back("activeAwaitingCommands.ogg");
+        sound_file_name_.push_back("standingUp.ogg");
+        sound_file_name_.push_back("shuttingDown.ogg");
+        sound_file_name_.push_back("autoLevelingBody.ogg");
+    }
+
 }
 
-void HexapodSound::soundsCallback( const hexapod_msgs::SoundsConstPtr &sounds_msg )
+void HexapodSound::soundsCallback( const std_msgs::Int32ConstPtr &sound_msg )
 {
-    if( sounds_msg->stand == true )
-    {
-        if( sounds_.stand != true )
-        {
-            sounds_.stand = true;
-        }
-    }
-
-    if( sounds_msg->shut_down == true )
-    {
-        if( sounds_.shut_down != true )
-        {
-            sounds_.shut_down = true;
-        }
-    }
-
-    if( sounds_msg->waiting == true )
-    {
-        if( sounds_.waiting != true )
-        {
-            sounds_.waiting = true;
-        }
-    }
-
-    if( sounds_msg->auto_level == true )
-    {
-        if( sounds_.auto_level != true )
-        {
-            sounds_.auto_level = true;
-        }
-    }
+    playSound(sound_msg->data);
 }
 
 
 void HexapodSound::playSoundFile(std::string sound_file, int delay_time)
 {
+ #ifndef MPLAYER_HACK
     sound_req_.sound = sound_play::SoundRequest::PLAY_FILE;
     sound_req_.command = sound_play::SoundRequest::PLAY_ONCE;
     sound_req_.arg = sound_package_path_ + "/sounds/" + sound_file; // need to due this due to bug in sound_play
     sound_pub_.publish( sound_req_ );
+#else
+    std::string command_line = "mplayer " + sound_package_path_ + "/sounds/" + sound_file;
+    int ret __attribute__((unused));
+    ret = std::system(command_line.c_str());
+#endif
     ros::Duration( delay_time ).sleep();
 }
+
+
+void HexapodSound::playSound(int sound_index)
+{
+    if (sound_index < sound_file_name_.size())
+    {
+        playSoundFile(sound_file_name_[sound_index], sound_delay_time_[sound_index]);
+    }
+    else
+    {
+        ROS_WARN("Sound index %d out of range", sound_index);
+    }
+}
+
 
 int main(int argc, char** argv)
 {
     ros::init(argc, argv, "hexapod_sound");
     HexapodSound hexapodSound;
 
+
+
+    // Now Play the init sounds...
     hexapodSound.playSoundFile( "empty.ogg", 3 );
-    hexapodSound.playSoundFile( "intelChime.ogg", 3 );
-    hexapodSound.playSoundFile( "activeAwaitingCommands.ogg", 3 );
 
-    ros::AsyncSpinner spinner( 1 ); // Using 1 threads
-    spinner.start();
-    ros::Rate loop_rate( 10 ); // 10 hz
-    while( ros::ok() )
-    {
-        if( hexapodSound.sounds_.stand == true )
-        {
-            hexapodSound.playSoundFile( "standingUp.ogg", 3 );
-            hexapodSound.sounds_.stand = false;
-        }
+    hexapodSound.playSound( HexapodSounds::STARTUP);
+    hexapodSound.playSound( HexapodSounds::WAITING);
 
-        if( hexapodSound.sounds_.auto_level == true )
-        {
-            hexapodSound.playSoundFile( "autoLevelingBody.ogg", 6 );
-            hexapodSound.sounds_.auto_level = false;
-        }
-
-        if( hexapodSound.sounds_.waiting == true )
-        {
-            hexapodSound.playSoundFile( "activeAwaitingCommands.ogg", 3 );
-            hexapodSound.sounds_.waiting = false;
-        }
-
-        if( hexapodSound.sounds_.shut_down == true )
-        {
-            hexapodSound.playSoundFile( "shuttingDown.ogg", 3);
-            hexapodSound.sounds_.shut_down = false;
-        }
-
-        loop_rate.sleep();
-    }
+    
+    // Then let ROS handle the thread for us... 
+    ros::spin();
 }

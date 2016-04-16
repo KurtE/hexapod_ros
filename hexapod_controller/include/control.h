@@ -37,6 +37,7 @@
 #include <std_srvs/Empty.h>
 #include <std_msgs/Bool.h>
 #include <std_msgs/Float64.h>
+#include <std_msgs/Int32.h>
 #include <geometry_msgs/Vector3.h>
 #include <geometry_msgs/Twist.h>
 #include <geometry_msgs/TwistWithCovarianceStamped.h>
@@ -49,7 +50,6 @@
 #include <hexapod_msgs/RPY.h>
 #include <hexapod_msgs/LegsJoints.h>
 #include <hexapod_msgs/FeetPositions.h>
-#include <hexapod_msgs/Sounds.h>
 
 //==============================================================================
 // Define class Control: This is the main structure of data that manipulates
@@ -80,7 +80,7 @@ class Control
         double velocity_division_;
 
     private:
-        hexapod_msgs::Sounds sounds_; // Sound bool array
+        std_msgs::Int32 sounds_;    // Index of which sound we wish to play
         std_msgs::Bool imu_override_; // Override body levelling for body manipulation
         bool imu_init_stored_; // Auto-levelling
         double imu_roll_lowpass_, imu_pitch_lowpass_, imu_yaw_lowpass_, imu_roll_init_, imu_pitch_init_; // Auto-levelling
