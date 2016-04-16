@@ -29,7 +29,7 @@
 
 
 #include <control.h>
-#include "../../hexapod_sound/include/hexapod_sound.h"
+#include <hexapod_sound.h>
 
 static const double PI = atan(1.0)*4.0;
 

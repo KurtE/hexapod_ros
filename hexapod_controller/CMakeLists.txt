@@ -11,7 +11,7 @@ catkin_package(
   CATKIN_DEPENDS nodelet roscpp geometry_msgs sensor_msgs std_msgs hexapod_msgs tf
 )
 
-include_directories(include ${catkin_INCLUDE_DIRS})
+include_directories(include ../hexapod_sound/include ${catkin_INCLUDE_DIRS})
 
 add_library( control src/control.cpp )
 add_dependencies( control hexapod_msgs_generate_messages_cpp )
