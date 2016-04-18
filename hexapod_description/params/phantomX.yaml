@@ -117,3 +117,7 @@ SOUNDS: {
     '04': {id: 3, type: 0, file: "shuttingDown2.ogg", delay: 3 },
     '05': {id: 4, type: 0, file: "autoLevelingBody.ogg", delay: 6 },
 }
+
+SOUND_INDEX_STAND: 2
+SOUND_INDEX_SHUTDOWN: 3
+SOUND_INDEX_AUTOLEVEL: 4

@@ -29,7 +29,6 @@
 
 
 #include <control.h>
-#include <hexapod_sound.h>
 
 static const double PI = atan(1.0)*4.0;
 
@@ -54,6 +53,11 @@ Control::Control( void )
     ros::param::get( "COMPENSATE_TO_WITHIN", COMPENSATE_TO_WITHIN );
     ros::param::get( "MASTER_LOOP_RATE", MASTER_LOOP_RATE );
     ros::param::get( "VELOCITY_DIVISION", VELOCITY_DIVISION );
+    ros::param::param<int>( "SOUND_INDEX_STAND", SOUND_INDEX_STAND, 2 );
+    ros::param::param<int>( "SOUND_INDEX_SHUTDOWN", SOUND_INDEX_SHUTDOWN, 3 );
+    ros::param::param<int>( "SOUND_INDEX_AUTOLEVEL", SOUND_INDEX_AUTOLEVEL, 4 );
+
+
     current_time_odometry_ = ros::Time::now();
     last_time_odometry_ = ros::Time::now();
     current_time_cmd_vel_ = ros::Time::now();
@@ -332,7 +336,7 @@ void Control::stateCallback( const std_msgs::BoolConstPtr &state_msg )
             body_.orientation.yaw = 0.0;
             body_.orientation.roll = 0.0;
             setHexActiveState( true );
-            sounds_.data = HexapodSounds::STAND;
+            sounds_.data = SOUND_INDEX_STAND;
             sounds_pub_.publish( sounds_ );
         }
     }
@@ -348,7 +352,7 @@ void Control::stateCallback( const std_msgs::BoolConstPtr &state_msg )
             body_.orientation.yaw = 0.0;
             body_.orientation.roll = 0.0;
             setHexActiveState( false );
-            sounds_.data = HexapodSounds::SHUT_DOWN;
+            sounds_.data = SOUND_INDEX_SHUTDOWN;
             sounds_pub_.publish( sounds_ );
         }
     }
@@ -395,7 +399,7 @@ void Control::imuCallback( const sensor_msgs::ImuConstPtr &imu_msg )
 
         if( ( std::abs( imu_roll_delta ) > MAX_BODY_ROLL_COMP ) || ( std::abs( imu_pitch_delta ) > MAX_BODY_PITCH_COMP ) )
         {
-            sounds_.data = HexapodSounds::AUTO_LEVEL;
+            sounds_.data = SOUND_INDEX_AUTOLEVEL;
             sounds_pub_.publish( sounds_ );
         }
 

@@ -94,6 +94,8 @@ class Control
         int NUMBER_OF_HEAD_JOINTS; // Number of head segments
         int NUMBER_OF_LEG_JOINTS;  // Number of leg segments
         XmlRpc::XmlRpcValue SERVOS;
+        int SOUND_INDEX_STAND, SOUND_INDEX_SHUTDOWN, SOUND_INDEX_AUTOLEVEL;
+
         std::vector<std::string> servo_map_key_;
         std::vector<std::string> servo_names_;
         std::vector<int> servo_orientation_;
