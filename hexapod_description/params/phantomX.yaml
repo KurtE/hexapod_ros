@@ -1,10 +1,10 @@
 # Configuration Settings
 
 # Servo controller Settings
-SERVO_CONTROLLER_ID: 200
-SERVO_CONTROLLER_BAUD: 2000000
-SERVO_CONTROLLER_DEVICE_NAME: /dev/ttyDXL
-SERVO_CONTROLLER_ENABLE_SERVOS_REGISTER: 24
+#SERVO_CONTROLLER_ID: 200
+#SERVO_CONTROLLER_BAUD: 2000000
+#SERVO_CONTROLLER_DEVICE_NAME: /dev/ttyDXL
+#SERVO_CONTROLLER_ENABLE_SERVOS_REGISTER: 24
 
 # Non teleop mode for naviagtion stack, Gazebo, etc type modes.
 # Controller will still have standup and sitdown functions for safty reasons 
@@ -83,7 +83,7 @@ MAX_LIFT_HEIGHT: 0.050
 LEG_GAIT_ORDER: [0, 1, 0, 1, 0, 1]
 
 # Speed in Hz that the servos interpolate between gait poses
-INTERPOLATION_LOOP_RATE: 550
+INTERPOLATION_LOOP_RATE: 1000
 
 # Servo descriptions
 SERVOS: {
@@ -108,3 +108,16 @@ SERVOS: {
     '19': {name: pan_joint, type: AX, id: 20, ticks: 1024, center: 512, max_radians: !degrees 300, sign: 1, offset: !degrees 0},
     '20': {name: tilt_joint, type: AX, id: 21, ticks: 1024, center: 512, max_radians: !degrees 300, sign: 1, offset: !degrees 0}
 }
+
+# Over ride Sound definitions. 
+SOUNDS: {
+    '01': {id: 0, type: 0, file: "phantomx_ready.ogg", delay: 3 },
+    '02': {id: 1, type: 0, file: "activeAwaitingCommands2.ogg", delay: 3 },
+    '03': {id: 2, type: 0, file: "standingUp.ogg", delay: 3 },
+    '04': {id: 3, type: 0, file: "shuttingDown2.ogg", delay: 3 },
+    '05': {id: 4, type: 0, file: "autoLevelingBody.ogg", delay: 6 },
+}
+
+SOUND_INDEX_STAND: 2
+SOUND_INDEX_SHUTDOWN: 3
+SOUND_INDEX_AUTOLEVEL: 4

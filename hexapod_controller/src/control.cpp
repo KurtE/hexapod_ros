@@ -53,6 +53,11 @@ Control::Control( void )
     ros::param::get( "COMPENSATE_TO_WITHIN", COMPENSATE_TO_WITHIN );
     ros::param::get( "MASTER_LOOP_RATE", MASTER_LOOP_RATE );
     ros::param::get( "VELOCITY_DIVISION", VELOCITY_DIVISION );
+    ros::param::param<int>( "SOUND_INDEX_STAND", SOUND_INDEX_STAND, 2 );
+    ros::param::param<int>( "SOUND_INDEX_SHUTDOWN", SOUND_INDEX_SHUTDOWN, 3 );
+    ros::param::param<int>( "SOUND_INDEX_AUTOLEVEL", SOUND_INDEX_AUTOLEVEL, 4 );
+
+
     current_time_odometry_ = ros::Time::now();
     last_time_odometry_ = ros::Time::now();
     current_time_cmd_vel_ = ros::Time::now();
@@ -80,6 +85,7 @@ Control::Control( void )
     imu_yaw_lowpass_ = 0.0;
     imu_roll_init_ = 0.0;
     imu_pitch_init_ = 0.0;
+    velocity_division_ = VELOCITY_DIVISION;     // setup default
 
     // Topics we are subscribing
     cmd_vel_sub_ = nh_.subscribe<geometry_msgs::Twist>( "/cmd_vel", 1, &Control::cmd_velCallback, this );
@@ -89,8 +95,11 @@ Control::Control( void )
     imu_override_sub_ = nh_.subscribe<std_msgs::Bool>( "/imu/imu_override", 1, &Control::imuOverrideCallback, this );
     imu_sub_ = nh_.subscribe<sensor_msgs::Imu>( "/imu/data", 1, &Control::imuCallback, this );
 
+    velocity_division_sub_ = nh_.subscribe<std_msgs::Float64>( "/velocity_division", 1, &Control::velocityDivisionCallback, this );
+
+
     // Topics we are publishing
-    sounds_pub_ = nh_.advertise<hexapod_msgs::Sounds>( "/sounds", 10 );
+    sounds_pub_ = nh_.advertise<std_msgs::Int32>( "/sounds", 10 );
     joint_state_pub_ = nh_.advertise<sensor_msgs::JointState>( "/joint_states", 10 );
     odom_pub_ = nh_.advertise<nav_msgs::Odometry>( "/odometry/calculated", 50 );
     twist_pub_ = nh_.advertise<geometry_msgs::TwistWithCovarianceStamped>( "/twist", 50 );
@@ -327,9 +336,8 @@ void Control::stateCallback( const std_msgs::BoolConstPtr &state_msg )
             body_.orientation.yaw = 0.0;
             body_.orientation.roll = 0.0;
             setHexActiveState( true );
-            sounds_.stand = true;
+            sounds_.data = SOUND_INDEX_STAND;
             sounds_pub_.publish( sounds_ );
-            sounds_.stand = false;
         }
     }
 
@@ -344,9 +352,8 @@ void Control::stateCallback( const std_msgs::BoolConstPtr &state_msg )
             body_.orientation.yaw = 0.0;
             body_.orientation.roll = 0.0;
             setHexActiveState( false );
-            sounds_.shut_down = true;
+            sounds_.data = SOUND_INDEX_SHUTDOWN;
             sounds_pub_.publish( sounds_ );
-            sounds_.shut_down = false;
         }
     }
 }
@@ -392,9 +399,8 @@ void Control::imuCallback( const sensor_msgs::ImuConstPtr &imu_msg )
 
         if( ( std::abs( imu_roll_delta ) > MAX_BODY_ROLL_COMP ) || ( std::abs( imu_pitch_delta ) > MAX_BODY_PITCH_COMP ) )
         {
-            sounds_.auto_level = true;
+            sounds_.data = SOUND_INDEX_AUTOLEVEL;
             sounds_pub_.publish( sounds_ );
-            sounds_.auto_level = false;
         }
 
         if( imu_roll_delta < -COMPENSATE_TO_WITHIN )
@@ -432,13 +438,21 @@ void Control::imuCallback( const sensor_msgs::ImuConstPtr &imu_msg )
 }
 
 //==============================================================================
+// VELOCITY_DIVISION  callback
+//==============================================================================
+
+void Control::velocityDivisionCallback( const std_msgs::Float64ConstPtr &msg )
+{
+    velocity_division_ = (double)msg->data;
+}
+//==============================================================================
 // Partitions up the cmd_vel to the speed of the loop rate
 //==============================================================================
 
 void Control::partitionCmd_vel( geometry_msgs::Twist *cmd_vel )
 {
-    // Instead of getting delta time we are calculating with a static division
-    double dt = VELOCITY_DIVISION;
+    // Use our member variable as to allow the value to be updated. 
+    double dt = velocity_division_;
 
     double delta_th = cmd_vel_incoming_.angular.z * dt;
     double delta_x = ( cmd_vel_incoming_.linear.x * cos( delta_th ) - cmd_vel_incoming_.linear.y * sin( delta_th ) ) * dt;

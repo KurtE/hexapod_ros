@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- run xv_11_laser_driver neato_laser_publisher -->
+
+<launch>
+    <node name="neato_laser" pkg="xv_11_laser_driver" type="neato_laser_publisher" output="screen" />
+    <node name="Laserscan_to_pointcloud" pkg="laserscan_to_pointcloud" type="laserscan_to_pointcloud" output="screen"  />
+</launch>

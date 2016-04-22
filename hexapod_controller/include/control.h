@@ -36,6 +36,8 @@
 #include <tf/transform_broadcaster.h>
 #include <std_srvs/Empty.h>
 #include <std_msgs/Bool.h>
+#include <std_msgs/Float64.h>
+#include <std_msgs/Int32.h>
 #include <geometry_msgs/Vector3.h>
 #include <geometry_msgs/Twist.h>
 #include <geometry_msgs/TwistWithCovarianceStamped.h>
@@ -48,7 +50,6 @@
 #include <hexapod_msgs/RPY.h>
 #include <hexapod_msgs/LegsJoints.h>
 #include <hexapod_msgs/FeetPositions.h>
-#include <hexapod_msgs/Sounds.h>
 
 //==============================================================================
 // Define class Control: This is the main structure of data that manipulates
@@ -76,9 +77,10 @@ class Control
         double STANDING_BODY_HEIGHT;
         geometry_msgs::Twist gait_vel_;
         geometry_msgs::Twist cmd_vel_;
+        double velocity_division_;
 
     private:
-        hexapod_msgs::Sounds sounds_; // Sound bool array
+        std_msgs::Int32 sounds_;    // Index of which sound we wish to play
         std_msgs::Bool imu_override_; // Override body levelling for body manipulation
         bool imu_init_stored_; // Auto-levelling
         double imu_roll_lowpass_, imu_pitch_lowpass_, imu_yaw_lowpass_, imu_roll_init_, imu_pitch_init_; // Auto-levelling
@@ -92,6 +94,8 @@ class Control
         int NUMBER_OF_HEAD_JOINTS; // Number of head segments
         int NUMBER_OF_LEG_JOINTS;  // Number of leg segments
         XmlRpc::XmlRpcValue SERVOS;
+        int SOUND_INDEX_STAND, SOUND_INDEX_SHUTDOWN, SOUND_INDEX_AUTOLEVEL;
+
         std::vector<std::string> servo_map_key_;
         std::vector<std::string> servo_names_;
         std::vector<int> servo_orientation_;
@@ -114,6 +118,9 @@ class Control
         void imuOverrideCallback( const std_msgs::BoolConstPtr &imu_override_msg );
         ros::Subscriber imu_sub_;
         void imuCallback( const sensor_msgs::ImuConstPtr &imu_msg );
+
+        ros::Subscriber velocity_division_sub_;
+        void velocityDivisionCallback( const std_msgs::Float64ConstPtr &msg );
 
         // Topics we are publishing
         ros::Publisher sounds_pub_;

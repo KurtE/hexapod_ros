@@ -34,6 +34,7 @@
 #include <ros/ros.h>
 #include <sensor_msgs/Joy.h>
 #include <std_msgs/Bool.h>
+#include <std_msgs/Float64.h>
 #include <geometry_msgs/Twist.h>
 #include <geometry_msgs/AccelStamped.h>
 
@@ -43,6 +44,8 @@ class HexapodTeleopJoystick
         HexapodTeleopJoystick( void );
         std_msgs::Bool state_;
         std_msgs::Bool imu_override_;
+        std_msgs::Bool debug_servos_;
+        std_msgs::Float64 velocity_division_;
         geometry_msgs::AccelStamped body_scalar_;
         geometry_msgs::AccelStamped head_scalar_;
         geometry_msgs::Twist cmd_vel_;
@@ -52,14 +55,26 @@ class HexapodTeleopJoystick
         ros::Publisher head_scalar_pub_;
         ros::Publisher state_pub_;
         ros::Publisher imu_override_pub_;
+        ros::Publisher velocity_division_pub_;
+        ros::Publisher servo_debug_pub_;
         bool NON_TELEOP; // Shuts down cmd_vel broadcast
 
     private:
         void joyCallback( const sensor_msgs::Joy::ConstPtr &joy );
+        bool buttonDown(  const sensor_msgs::Joy::ConstPtr &joy, int button_index );             // Is a logically pressed down...
+        bool buttonPressed ( const sensor_msgs::Joy::ConstPtr &joy, int button_index );    // Is button down and previous call not?
+        bool buttonReleased ( const sensor_msgs::Joy::ConstPtr &joy, int button_index );
+
+        std::vector<int> buttons_prev_;              // remember previous state of buttons so we can know when pressed and released. 
+
         ros::NodeHandle nh_;
         ros::Subscriber joy_sub_;
         int STANDUP_BUTTON, SITDOWN_BUTTON, BODY_ROTATION_BUTTON, FORWARD_BACKWARD_AXES, LEFT_RIGHT_AXES, YAW_ROTATION_AXES, PITCH_ROTATION_AXES;
+        int  SPEED_UP_BUTTON, SLOW_DOWN_BUTTON, DEBUG_BUTTON;
+
+        double VELOCITY_DIVISION, MAX_VELOCITY_DIVISION, MIN_VELOCITY_DIVISION;
         double MAX_METERS_PER_SEC, MAX_RADIANS_PER_SEC;
+        double cmd_vel_speed_scaler_;
 };
 
 #endif // HEXAPOD_TELEOP_H_

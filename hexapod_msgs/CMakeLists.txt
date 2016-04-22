@@ -19,7 +19,6 @@ add_message_files(
    FeetPositions.msg
    Pose.msg
    RPY.msg
-   Sounds.msg
 )
 
 ## Generate added messages and services with any dependencies listed here

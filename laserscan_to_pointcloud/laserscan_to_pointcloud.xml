@@ -1,0 +1,9 @@
+<!-- laserscan_to_pointcloud listener -->
+<library path="lib/laserscan_to_pointcloud">
+  <class name="laserscan_to_pointcloud/laserscan_to_pointcloud" type="laserscan_to_pointcloud" 
+    base_class_type="nodelet::Nodelet">
+    <description>
+      laserscan_to_pointcloud listener.
+    </description>
+  </class>
+</library>

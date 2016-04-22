@@ -33,21 +33,45 @@
 
 #include <ros/ros.h>
 #include <sound_play/sound_play.h>
-#include <hexapod_msgs/Sounds.h>
+#include <std_msgs/Int32.h>
+
+namespace HexapodSounds
+{
+    enum {
+        STARTUP,
+        WAITING,
+        STAND,
+        SHUT_DOWN,
+        AUTO_LEVEL
+    };
+    enum {
+        SOUND_FILE=0,
+        SOUND_NOTES
+    };
+}
 
 class HexapodSound
 {
     public:
         HexapodSound( void );
         sound_play::SoundRequest sound_req_;
-        hexapod_msgs::Sounds sounds_;
         ros::Publisher sound_pub_;
         void playSoundFile(std::string sound_file, int delay_time);
+        void playSound(int sound_index);
+
+        // Define sounds in a vector - soon to yaml file
+        XmlRpc::XmlRpcValue SOUNDS; // Servo map from yaml config file
+        std::vector<std::string> sound_map_key_;
+        std::vector<int> sound_id_;
+        std::vector<int> sound_type_;
+        std::vector<std::string> sound_file_name_;
+        std::vector<int> sound_delay_time_;
 
     private:
+
         ros::NodeHandle nh_;
         std::string sound_package_path_;
-        void soundsCallback( const hexapod_msgs::SoundsConstPtr &sounds_msg );
+        void soundsCallback( const std_msgs::Int32ConstPtr &sound_msg);
         ros::Subscriber sounds_sub_;
 };
 
