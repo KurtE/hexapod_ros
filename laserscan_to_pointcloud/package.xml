@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<package>
+  <name>laserscan_to_pointcloud</name>
+  <version>0.2.0</version>
+  <description>laserscan_to_pointcloud node for hexapod research platform</description>
+  <author email="kevin.ochs@gmail.com">Kevin Ochs</author>
+  <maintainer email="kevin.ochs@gmail.com">Kevin Ochs</maintainer>
+  <license>BSD</license>
+  
+  <url type="website">http://ros.org</url>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>nodelet</build_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>geometry_msgs</build_depend>
+  <build_depend>geometry_msgs</build_depend>
+  <build_depend>sensor_msgs</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_depend>laser_geometry</build_depend>
+  <build_depend>cmake_modules</build_depend>
+  <build_depend>tf</build_depend>
+  <run_depend>nodelet</run_depend>
+  <run_depend>roscpp</run_depend>
+  <run_depend>geometry_msgs</run_depend>
+  <run_depend>sensor_msgs</run_depend>
+  <run_depend>std_msgs</run_depend>
+  <run_depend>laser_geometry</run_depend>
+  <run_depend>tf</run_depend>
+
+  <export>
+    <nodelet plugin="${prefix}/laserscan_to_pointcloud.xml" />
+  </export>
+</package>
