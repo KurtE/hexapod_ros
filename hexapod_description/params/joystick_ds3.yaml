@@ -12,6 +12,15 @@ SITDOWN_BUTTON: 0
 # "L2" button
 BODY_ROTATION_BUTTON: 8
 
+# Speed up button (D-Pad UP)
+SPEED_UP_BUTTON: 4
+
+# Slow down button (D-PAD DOWN)
+SLOW_DOWN_BUTTON: 6
+
+# DEBUG Toggle button X
+DEBUG_BUTTON: 14
+
 # Left joystick up/down
 FORWARD_BACKWARD_AXES: 1
 

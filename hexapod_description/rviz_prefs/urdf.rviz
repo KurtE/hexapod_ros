@@ -102,6 +102,8 @@ Visualization Manager:
           Value: true
         imu_link:
           Value: true
+        neato_laser:
+          Value: true  
         leg_center_LF:
           Value: true
         leg_center_LM:
@@ -160,6 +162,8 @@ Visualization Manager:
               camera_rgb_optical_frame:
                 {}
               imu_link:
+                {}
+              neato_laser:
                 {}
               leg_center_LF:
                 coxa_LF:
